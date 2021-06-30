@@ -130,26 +130,41 @@ pub enum scmp_compare {
 #[derive(Debug, Clone, Copy)]
 #[repr(C)]
 pub enum scmp_arch {
+    /** The native architecture token */
     SCMP_ARCH_NATIVE = 0x0,
+    /** The x86 (32-bit) architecture token */
     SCMP_ARCH_X86 = 0x40000003,
+    /** The x86-64 (64-bit) architecture token */
     SCMP_ARCH_X86_64 = 0xc000003e,
+    /** The x32 (32-bit x86_64) architecture token
+        NOTE: this is different from the value used by the kernel because we need to
+        be able to distinguish between x32 and x86_64 */
     SCMP_ARCH_X32 = 0x4000003e,
+    /** The ARM architecture tokens */
     SCMP_ARCH_ARM = 0x40000028,
+    /** AArch64 support for audit was merged in 3.17-rc1 */
     SCMP_ARCH_AARCH64 = 0xc00000b7,
+    /** The MIPS architecture tokens */
     SCMP_ARCH_MIPS = 0x8,
     SCMP_ARCH_MIPS64 = 0x80000008,
     SCMP_ARCH_MIPS64N32 = 0xa0000008,
     SCMP_ARCH_MIPSEL = 0x40000008,
     SCMP_ARCH_MIPSEL64 = 0xc0000008,
     SCMP_ARCH_MIPSEL64N32 = 0xe0000008,
+    /** The PowerPC architecture tokens */
     SCMP_ARCH_PPC = 0x14,
     SCMP_ARCH_PPC64 = 0x80000015,
     SCMP_ARCH_PPC64LE = 0xc0000015,
+    /** The S390 architecture tokens */
     SCMP_ARCH_S390 = 0x16,
     SCMP_ARCH_S390X = 0x80000016,
+    /** The PA-RISC hppa architecture tokens */
     SCMP_ARCH_PARISC = 0xf,
     SCMP_ARCH_PARISC64 = 0x8000000f,
+    /** The RISC-V architecture tokens */
     SCMP_ARCH_RISCV64 = 0xc00000f3,
+    /** The SuperH architecture tokens */
+    SCMP_ARCH_SHEB = 0x4000002a,
 }
 
 /**
