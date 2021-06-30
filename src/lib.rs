@@ -61,28 +61,28 @@ pub const SCMP_ACT_NOTIFY: u32 = 0x7fc00000;
 #[repr(C)]
 pub enum scmp_filter_attr {
     _SCMP_FLTATR_MIN,
-    SCMP_FLTATR_ACT_DEFAULT,
     /** default filter action */
-    SCMP_FLTATR_ACT_BADARCH,
+    SCMP_FLTATR_ACT_DEFAULT,
     /** bad architecture action */
-    SCMP_FLTATR_CTL_NNP,
+    SCMP_FLTATR_ACT_BADARCH,
     /** set NO_NEW_PRIVS on filter load */
-    SCMP_FLTATR_CTL_TSYNC,
+    SCMP_FLTATR_CTL_NNP,
     /** sync threads on filter load */
-    SCMP_FLTATR_API_TSKIP,
+    SCMP_FLTATR_CTL_TSYNC,
     /** allow rules with a -1 syscall */
-    SCMP_FLTATR_CTL_LOG,
+    SCMP_FLTATR_API_TSKIP,
     /** log not-allowed actions */
-    SCMP_FLTATR_CTL_SSB,
+    SCMP_FLTATR_CTL_LOG,
     /** disable SSB mitigation */
-    SCMP_FLTATR_CTL_OPTIMIZE,
+    SCMP_FLTATR_CTL_SSB,
     /** filter optimization level:
      * 0 - currently unused
      * 1 - rules weighted by priority and complexity (DEFAULT)
      * 2 - binary tree sorted by syscall number
      */
-    SCMP_FLTATR_API_SYSRAWRC,
+    SCMP_FLTATR_CTL_OPTIMIZE,
     /** return the system return codes */
+    SCMP_FLTATR_API_SYSRAWRC,
     _SCMP_FLTATR_MAX,
 }
 
@@ -94,20 +94,20 @@ pub enum scmp_filter_attr {
 #[repr(C)]
 pub enum scmp_compare {
     _SCMP_CMP_MIN = 0,
-    SCMP_CMP_NE = 1,
     /** not equal */
-    SCMP_CMP_LT = 2,
+    SCMP_CMP_NE = 1,
     /** less than */
-    SCMP_CMP_LE = 3,
+    SCMP_CMP_LT = 2,
     /** less than or equal */
-    SCMP_CMP_EQ = 4,
+    SCMP_CMP_LE = 3,
     /** equal */
-    SCMP_CMP_GE = 5,
+    SCMP_CMP_EQ = 4,
     /** greater than or equal */
-    SCMP_CMP_GT = 6,
+    SCMP_CMP_GE = 5,
     /** greater than */
-    SCMP_CMP_MASKED_EQ = 7,
+    SCMP_CMP_GT = 6,
     /** masked equality */
+    SCMP_CMP_MASKED_EQ = 7,
     _SCMP_CMP_MAX,
 }
 
@@ -152,10 +152,10 @@ pub type scmp_datum_t = u64;
 #[derive(Debug)]
 #[repr(C)]
 pub struct scmp_arg_cmp {
-    pub arg: libc::c_uint,
     /** argument number, starting at 0 */
-    pub op: scmp_compare,
+    pub arg: libc::c_uint,
     /** the comparison op, e.g. SCMP_CMP_* */
+    pub op: scmp_compare,
     pub datum_a: scmp_datum_t,
     pub datum_b: scmp_datum_t,
 }
