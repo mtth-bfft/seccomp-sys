@@ -6,7 +6,7 @@ extern crate libc;
 pub type scmp_filter_ctx = libc::c_void;
 
 /**
- * Error retern value
+ * Error return value
  */
 pub const __NR_SCMP_ERROR: libc::c_int = -1;
 
@@ -270,7 +270,7 @@ extern "C" {
      * use with libseccomp, returns zero on failure.
      *
      */
-    pub fn seccomp_arch_resolve_name(arch_name: *const libc::c_char) -> libc::c_uint;
+    pub fn seccomp_arch_resolve_name(arch_name: *const libc::c_char) -> u32;
 
     /**
      * Loads the filter into the kernel
@@ -511,7 +511,7 @@ extern "C" {
     pub fn seccomp_notify_free(
         req: *mut seccomp_notif,
         resp: *mut seccomp_notif_resp,
-    ) -> libc::c_void;
+    );
 
     /**
      * Receive a notification from a seccomp notification fd
