@@ -60,30 +60,30 @@ pub const SCMP_ACT_NOTIFY: u32 = 0x7fc00000;
 #[derive(Debug, Clone, Copy)]
 #[repr(C)]
 pub enum scmp_filter_attr {
-    _SCMP_FLTATR_MIN,
+    _SCMP_FLTATR_MIN = 0,
     /** default filter action */
-    SCMP_FLTATR_ACT_DEFAULT,
+    SCMP_FLTATR_ACT_DEFAULT = 1,
     /** bad architecture action */
-    SCMP_FLTATR_ACT_BADARCH,
+    SCMP_FLTATR_ACT_BADARCH = 2,
     /** set NO_NEW_PRIVS on filter load */
-    SCMP_FLTATR_CTL_NNP,
+    SCMP_FLTATR_CTL_NNP = 3,
     /** sync threads on filter load */
-    SCMP_FLTATR_CTL_TSYNC,
+    SCMP_FLTATR_CTL_TSYNC = 4,
     /** allow rules with a -1 syscall */
-    SCMP_FLTATR_API_TSKIP,
+    SCMP_FLTATR_API_TSKIP = 5,
     /** log not-allowed actions */
-    SCMP_FLTATR_CTL_LOG,
+    SCMP_FLTATR_CTL_LOG = 6,
     /** disable SSB mitigation */
-    SCMP_FLTATR_CTL_SSB,
+    SCMP_FLTATR_CTL_SSB = 7,
     /** filter optimization level:
      * 0 - currently unused
      * 1 - rules weighted by priority and complexity (DEFAULT)
      * 2 - binary tree sorted by syscall number
      */
-    SCMP_FLTATR_CTL_OPTIMIZE,
+    SCMP_FLTATR_CTL_OPTIMIZE = 8,
     /** return the system return codes */
-    SCMP_FLTATR_API_SYSRAWRC,
-    _SCMP_FLTATR_MAX,
+    SCMP_FLTATR_API_SYSRAWRC = 9,
+    _SCMP_FLTATR_MAX = 10,
 }
 
 /**
