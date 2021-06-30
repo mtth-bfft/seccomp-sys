@@ -54,6 +54,18 @@ pub const SCMP_ACT_ALLOW: u32 = 0x7fff0000;
 pub const SCMP_ACT_NOTIFY: u32 = 0x7fc00000;
 
 /**
+ * Version information
+ */
+#[allow(non_camel_case_types)]
+#[derive(Debug, Clone, Copy)]
+#[repr(C)]
+pub struct scmp_version {
+    major: libc::c_uint,
+    minor: libc::c_uint,
+    micro: libc::c_uint,
+}
+
+/**
  * Filter attributes
  */
 #[allow(non_camel_case_types)]
@@ -199,6 +211,46 @@ pub struct seccomp_notif_resp {
 #[link(name = "seccomp")]
 extern "C" {
     /**
+     * Query the library version information
+     *
+     * This function returns a pointer to a populated scmp_version struct, the
+     * caller does not need to free the structure when finished.
+     */
+    pub fn seccomp_version() -> *const scmp_version;
+    /**
+     * Query the library's level of API support
+     *
+     * This function returns an API level value indicating the current supported
+     * functionality.  It is important to note that this level of support is
+     * determined at runtime and therefore can change based on the running kernel
+     * and system configuration (e.g. any previously loaded seccomp filters).  This
+     * function can be called multiple times, but it only queries the system the
+     * first time it is called, the API level is cached and used in subsequent
+     * calls.
+     *
+     * The current API levels are described below:
+     *  0 : reserved
+     *  1 : base level
+     *  2 : support for the SCMP_FLTATR_CTL_TSYNC filter attribute
+     *      uses the seccomp(2) syscall instead of the prctl(2) syscall
+     *  3 : support for the SCMP_FLTATR_CTL_LOG filter attribute
+     *      support for the SCMP_ACT_LOG action
+     *      support for the SCMP_ACT_KILL_PROCESS action
+     *  4 : support for the SCMP_FLTATR_CTL_SSB filter attrbute
+     *  5 : support for the SCMP_ACT_NOTIFY action and notify APIs
+     *  6 : support the simultaneous use of SCMP_FLTATR_CTL_TSYNC and notify APIs
+     */
+    pub fn seccomp_api_get() -> libc::c_uint;
+    /**
+     * Set the library's level of API support
+     *
+     * This function forcibly sets the API level of the library at runtime.  Valid
+     * API levels are discussed in the description of the seccomp_api_get()
+     * function.  General use of this function is strongly discouraged.
+     *
+     */
+    pub fn seccomp_api_set(level: libc::c_uint);
+    /**
      * Initialize the filter state
      *
      * @param def_action the default filter action
@@ -234,7 +286,38 @@ extern "C" {
      *
      */
     pub fn seccomp_release(ctx: *mut scmp_filter_ctx);
-
+    /**
+     * Merge two filters
+     * @param ctx_dst the destination filter context
+     * @param ctx_src the source filter context
+     *
+     * This function merges two filter contexts into a single filter context and
+     * destroys the second filter context.  The two filter contexts must have the
+     * same attribute values and not contain any of the same architectures; if they
+     * do, the merge operation will fail.  On success, the source filter context
+     * will be destroyed and should no longer be used; it is not necessary to
+     * call seccomp_release() on the source filter context.  Returns zero on
+     * success, negative values on failure.
+     */
+    pub fn seccomp_merge(ctx_dst: *mut scmp_filter_ctx, ctx_src: *mut scmp_filter_ctx) -> libc::c_int;
+    /**
+     * Return the native architecture token
+     *
+     * This function returns the native architecture token value, e.g. SCMP_ARCH_*.
+     */
+    pub fn seccomp_arch_native() -> u32;
+    /**
+     * Check to see if an existing architecture is present in the filter
+     * @param ctx the filter context
+     * @param arch_token the architecture token, e.g. SCMP_ARCH_*
+     *
+     * This function tests to see if a given architecture is included in the filter
+     * context.  If the architecture token is SCMP_ARCH_NATIVE then the native
+     * architecture will be assumed.  Returns zero if the architecture exists in
+     * the filter, -EEXIST if it is not present, and other negative values on
+     * failure.
+     */
+    pub fn seccomp_arch_exist(ctx: *const scmp_filter_ctx, arch_token: u32) -> libc::c_int;
     /**
      * Adds an architecture to the filter
      * @param ctx the filter context
@@ -321,14 +404,14 @@ extern "C" {
 
     /**
      * Resolve a syscall name to a number
+     * @param arch_token the architecture token, e.g. SCMP_ARCH_*
      * @param name the syscall name
      *
-     * Resolve the given syscall name to the syscall number.  Returns the syscall
-     * number on success, including negative pseudo syscall numbers (e.g. __PNR_*);
-     * returns __NR_SCMP_ERROR on failure.
-     *
+     * Resolve the given syscall name to the syscall number for the given
+     * architecture.  Returns the syscall number on success, including negative
+     * pseudo syscall numbers (e.g. __PNR_*); returns __NR_SCMP_ERROR on failure.
      */
-    pub fn seccomp_syscall_resolve_name(name: *const libc::c_char) -> libc::c_int;
+    pub fn seccomp_syscall_resolve_name_arch(arch_token: u32, name: *const libc::c_char) -> libc::c_int;
 
     /**
      * Resolve a syscall number to a name
@@ -344,6 +427,33 @@ extern "C" {
         arch_token: u32,
         num: libc::c_int,
     ) -> *const libc::c_char;
+
+    /**
+     * Resolve a syscall name to a number and perform any rewriting necessary
+     * @param arch_token the architecture token, e.g. SCMP_ARCH_*
+     * @param name the syscall name
+     *
+     * Resolve the given syscall name to the syscall number for the given
+     * architecture and do any necessary syscall rewriting needed by the
+     * architecture.  Returns the syscall number on success, including negative
+     * pseudo syscall numbers (e.g. __PNR_*); returns __NR_SCMP_ERROR on failure.
+     *
+     */
+    pub fn seccomp_syscall_resolve_name_rewrite(
+        arch_token: u32,
+        name: *const libc::c_char
+    ) -> libc::c_int;
+
+    /**
+     * Resolve a syscall name to a number
+     * @param name the syscall name
+     *
+     * Resolve the given syscall name to the syscall number.  Returns the syscall
+     * number on success, including negative pseudo syscall numbers (e.g. __PNR_*);
+     * returns __NR_SCMP_ERROR on failure.
+     *
+     */
+    pub fn seccomp_syscall_resolve_name(name: *const libc::c_char) -> libc::c_int;
 
     /**
      * Set the priority of a given syscall
