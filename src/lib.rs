@@ -128,7 +128,7 @@ pub enum scmp_compare {
  */
 #[allow(non_camel_case_types)]
 #[derive(Debug, Clone, Copy)]
-#[repr(C)]
+#[repr(u32)]
 pub enum scmp_arch {
     /** The native architecture token */
     SCMP_ARCH_NATIVE = 0x0,
