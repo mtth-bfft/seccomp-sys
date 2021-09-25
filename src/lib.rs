@@ -621,7 +621,7 @@ extern "C" {
      * success, and negative values on failure.
      *
      */
-    #[cfg(seccomp_notify)]
+    #[cfg(feature="notify")]
     pub fn seccomp_notify_alloc(
         req: *mut *mut seccomp_notif,
         resp: *mut *mut seccomp_notif_resp,
@@ -632,7 +632,7 @@ extern "C" {
      * @param req the request location
      * @param resp the response location
      */
-    #[cfg(seccomp_notify)]
+    #[cfg(feature="notify")]
     pub fn seccomp_notify_free(
         req: *mut seccomp_notif,
         resp: *mut seccomp_notif_resp,
@@ -648,7 +648,7 @@ extern "C" {
      * negative values on error.
      *
      */
-    #[cfg(seccomp_notify)]
+    #[cfg(feature="notify")]
     pub fn seccomp_notify_receive(fd: libc::c_int, req: *mut seccomp_notif) -> libc::c_int;
 
     /**
@@ -661,7 +661,7 @@ extern "C" {
      * negative values on error.
      *
      */
-    #[cfg(seccomp_notify)]
+    #[cfg(feature="notify")]
     pub fn seccomp_notify_respond(fd: libc::c_int, resp: *mut seccomp_notif_resp) -> libc::c_int;
 
     /**
@@ -673,7 +673,7 @@ extern "C" {
      * negative values on failure.
      *
      */
-    #[cfg(seccomp_notify)]
+    #[cfg(feature="notify")]
     pub fn seccomp_notify_id_valid(fd: libc::c_int, id: u64) -> libc::c_int;
 
     /**
@@ -685,7 +685,7 @@ extern "C" {
      * use of SCMP_ACT_NOTIFY.
      *
      */
-    #[cfg(seccomp_notify)]
+    #[cfg(feature="notify")]
     pub fn seccomp_notify_fd(ctx: *const scmp_filter_ctx) -> libc::c_int;
 }
 
